@@ -5,8 +5,8 @@ close all;
 
 t = datetime('now')
 
-if t.Minute > 15 || t.Minute <14
-    msg = 'Minute is not between 14 and 15';
+if t.Minute > 15 %% || t.Minute <0
+    msg = 'Minute is not between 13 and 15';
     disp(msg)
 %    return
     quit
@@ -32,7 +32,7 @@ end
 
 Connection=false;
 Number_of_try=0;
-Max_Number_Of_Try=10;
+Max_Number_Of_Try=20;
 while Connection==false
     Number_of_try = Number_of_try + 1
     
@@ -52,6 +52,7 @@ while Connection==false
     end
 end
 pause(0.01);
+pause(1); % peut-être à virer. Mais sans doute pas.
 iteration
 tic
 while   tcp_client.NumBytesAvailable>0
