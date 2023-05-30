@@ -5,7 +5,7 @@ close all;
 
 t = datetime('now')
 
-if t.Minute > 15 %% || t.Minute <0
+if t.Minute > 15  || t.Minute < 13
     msg = 'Minute is not between 13 and 15';
     disp(msg)
 %    return
@@ -23,7 +23,7 @@ if isfile('Data_ESP_Mildiou.mat')
     
 else
     
-    Data = table('Size',[Number_Iteration 4],'VariableTypes',{'datetime','double','double','double',});
+    Data = table('Size',[Number_Iteration 5],'VariableTypes',{'datetime','double','double','double','double'});
     Data.Var1.TimeZone='local'; %set timezone is needed later to combine datetime
     iteration = 0;
 end
@@ -51,8 +51,9 @@ while Connection==false
         disp(error);
     end
 end
-pause(0.01);
-pause(1); % peut-être à virer. Mais sans doute pas.
+%pause(0.01);
+%pause(1); % peut-être à virer. Mais sans doute pas.
+pause(0.05);
 iteration
 tic
 while   tcp_client.NumBytesAvailable>0
@@ -65,7 +66,7 @@ while   tcp_client.NumBytesAvailable>0
         
         SplitLine=split(Line,",");
         Double_Line=num2cell(str2double(SplitLine))';
-        Data(iteration,2:4)=Double_Line;
+        Data(iteration,2:5)=Double_Line;
         Wanted_DateTime =datetime(table2array(Data(iteration,2)), 'convertfrom', 'posixtime', 'Format', 'yyyy-MM-dd HH:mm:ss','TimeZone','local');
         Data(iteration,1)={Wanted_DateTime};
         
@@ -78,7 +79,7 @@ T=toc
 iteration
 
 f=figure;
-tiledlayout(2,1);
+tiledlayout(3,1);
 ax1=nexttile;
 plot(Data.Var1(1:iteration),Data.Var3(1:iteration),'-+b')
 ylabel('Humidity')
@@ -91,6 +92,13 @@ ylabel('Temperature')
 xlabel('Time')
 ylim([0 50])
 
+
+ax3=nexttile;
+plot(Data.Var1(1:iteration),Data.Var5(1:iteration),'-+r')
+ylabel('Battery level (analogread)')
+xlabel('Time')
+ylim([0 100])
+
 savefig('F:\Documents\MATLAB\ESP_Mildiou\Figure_ESP_Mildiou.fig');
 close(gcf);
 
@@ -99,4 +107,8 @@ toc
 t = datetime('now')
 disp("Data and figure saved and updated");
 
-clear variables;
+
+clear tcp_client;
+disp('tcp_client cleared')
+pause(2);
+clearvars; 
